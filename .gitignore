@@ -1,0 +1,50 @@
+# ==========================================================================
+# Keil uVision IDE Outputs and Temporary Files
+# ==========================================================================
+# Compiling and Listings directories
+Objects/
+Listings/
+_LinkerReport/
+
+# Object files and dependencies
+*.o
+*.d
+*.crf
+*.bak
+*.htm
+*.dep
+*.lnp
+*.sct
+*.lst
+*.m51
+
+# Target Build Outputs
+*.axf
+*.elf
+*.hex
+*.bin
+*.map
+
+# User-specific Keil settings (window layouts, breakpoints, etc.)
+*.uvgui.*
+*.uvguix.*
+*.uv2.bak
+*.pjt.bak
+
+# ==========================================================================
+# STM32CubeMX Configuration
+# ==========================================================================
+# Backup files generated during code re-generation
+~*.tmp
+*.bak
+
+# NOTE: Do NOT ignore the *.ioc file! 
+# It contains your CubeMX pinout and clock configuration (48MHz, Very High Speed).
+# Other developers need it to understand your hardware setup.
+#! *.ioc
+
+# ==========================================================================
+# Operating System & Common Junk
+# ==========================================================================
+.DS_Store
+Thumbs.db
