@@ -61,6 +61,13 @@ while (1)
 | :---: | :---: |
 | ![BSRR -O0](images/bsrr_o0.png) | ![BSRR -O3](images/bsrr_o3.png) |
 
+### 3. Visual Proof of Compiler Loop Unrolling
+*Under high optimization (-O2, -O3), the BSRR pulse train becomes non-uniform. The tightly grouped bursts represent sequence register writes, while the wider gaps show the execution of the loop boundary jump:*
+
+| Loop Unrolling Phenomenon (BSRR @ -O3) |
+| :---: |
+| ![BSRR Loop Unrolling](images/bsrr_o3_loop_unrolling.png) |
+
 ## 🔬 Advanced Engineering Analysis
 
 ### 1. The 2-Clock Physical Limit (`BSRR` @ `-O2`/`-O3`)
