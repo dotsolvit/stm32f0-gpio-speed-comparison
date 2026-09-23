@@ -45,7 +45,21 @@ while (1)
 | **`-O2`** | 396.0 ns | 40.80 ns | **9.7x**  | HAL functions are inlined. BSRR hits peak efficiency. |
 | **`-O3`** | 396.0 ns | 40.80 ns | **9.7x**  | Identical to -O2; absolute hardware switching limit achieved. |
 
----
+## 🔬 Oscilloscope Captures
+
+### 1. HAL Library Implementation (-O0 vs -O3)
+*HAL toggling speed improves significantly with optimization, but function calls still introduce overhead:*
+
+| Optimization -O0 (No Optimization) | Optimization -O3 (Maximum) |
+| :---: | :---: |
+| ![HAL -O0](images/hal_o0.png) | ![HAL -O3](images/hal_o3.png) |
+
+### 2. Direct Register Access Implementation (-O0 vs -O3)
+*Direct BSRR writes hit the absolute hardware clock speed limits:*
+
+| Optimization -O0 (No Optimization) | Optimization -O3 (Maximum) |
+| :---: | :---: |
+| ![BSRR -O0](images/bsrr_o0.png) | ![BSRR -O3](images/bsrr_o3.png) |
 
 ## 🔬 Advanced Engineering Analysis
 
@@ -60,8 +74,6 @@ At high switching rates (pulse width < 100 ns), significant high-frequency oscil
 ### 3. Compiler Loop Unrolling Artifact (Non-uniform Pulse Train)
 During the experiment, I discovered a fascinating anomaly: at `-O0` and `-O1`, the pulse sequence was completely uniform. However, at `-O2` and `-O3`, the `BSRR` signal train became **non-uniform (grouped in packets)**.
 * **Explanation:** This is a textbook demonstration of **Compiler Loop Unrolling**. To minimize the overhead caused by conditional branching (`jump` instructions), Arm Compiler 6 replicates the bit-toggling assembly instructions multiple times sequentially in Flash memory. The tight groups of pulses represent back-to-back register modifications, while the wider gaps represent the execution of the loop boundary jump back to the beginning of the block.
-
----
 
 ## 💡 Conclusion
 While the STMicroelectronics HAL library drastically simplifies development and improves code portability across different STM32 families, it introduces massive performance penalties (up to 14.5x slower execution). For strict real-time applications, time-critical protocols, or low-overhead interrupt handlers, direct register modification via CMSIS combined with high compiler optimization (`-O2`/`-O3`) is mandatory.
