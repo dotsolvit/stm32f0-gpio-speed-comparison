@@ -94,7 +94,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
+    /* --- ВАРІАНТ 1: Бібліотека HAL --- */
+    /* Розкоментуйте цей блок для тесту HAL, а блок регістрів закоментуйте */
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);                  
+  
+    /* --- ВАРІАНТ 2: Пряма робота з регістрами (CMSIS) --- */
+    /* Розкоментуйте цей блок для тесту регістрів, а блок HAL закоментуйте */
+    //GPIOC->BSRR = GPIO_BSRR_BS_8;  // Встановлення PC8 в 1 (3.3В)
+    //GPIOC->BSRR = GPIO_BSRR_BR_8;  // Скидання PC8 в 0 (0В)
+		
+		/* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
