@@ -66,7 +66,7 @@ while (1)
 
 | Loop Unrolling Phenomenon (BSRR @ -O3) |
 | :---: |
-| ![BSRR Loop Unrolling](images/bsrr_o3_loop_unrolling.png) |
+| ![BSRR Loop Unrolling](images/bsrr_o3_artifact.png) |
 
 ## 🔬 Advanced Engineering Analysis
 
