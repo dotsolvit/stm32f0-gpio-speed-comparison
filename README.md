@@ -61,7 +61,7 @@ while (1)
 | :---: | :---: |
 | ![BSRR -O0](images/bsrr_o0.png) | ![BSRR -O3](images/bsrr_o3.png) |
 
-### 3. Visual Proof of Compiler Loop Unrolling
+### 3. Visual confirmation of signal non-uniformity
 *Under high optimization (-O2, -O3), the BSRR pulse train becomes non-uniform. The tightly grouped bursts represent sequence register writes, while the wider gaps show the execution of the loop boundary jump:*
 
 | Loop Unrolling Phenomenon (BSRR @ -O3) |
@@ -78,9 +78,16 @@ My oscilloscope captured a peak register pulse width of **40.80 ns**, which tran
 At high switching rates (pulse width < 100 ns), significant high-frequency oscillations ("ringing") are visible on the waveform edges. 
 * **Cause:** This is a classic signal integrity artifact. Because the GPIO speed is set to *High*, the slew rate is extremely fast (sharp edges). The ground lead ("alligator clip") of the oscilloscope probe acts as an inductor, forming an LC resonant circuit with the scope's input capacitance. 
 
-### 3. Compiler Loop Unrolling Artifact (Non-uniform Pulse Train)
-During the experiment, I discovered a fascinating anomaly: at `-O0` and `-O1`, the pulse sequence was completely uniform. However, at `-O2` and `-O3`, the `BSRR` signal train became **non-uniform (grouped in packets)**.
-* **Explanation:** This is a textbook demonstration of **Compiler Loop Unrolling**. To minimize the overhead caused by conditional branching (`jump` instructions), Arm Compiler 6 replicates the bit-toggling assembly instructions multiple times sequentially in Flash memory. The tight groups of pulses represent back-to-back register modifications, while the wider gaps represent the execution of the loop boundary jump back to the beginning of the block.
+### 3. Compiler and Flash Architecture Artifact (Non-uniform Pulse Train)
+During the experiment, a fascinating anomaly was discovered: at `-O0` and `-O1`, the pulse sequence was completely uniform. However, at `-O2` and `-O3`, the `BSRR` signal train became **non-uniform (grouped in periodic packets with a missing pulse after every 4 cycles)**.
+
+* **Analysis & Hypotheses:**
+  This behavior is a complex result of compiler behavior combined with the **STM32F0 Flash memory architecture**. According to the STMicroelectronics reference manual, the Flash interface has a frequency limit of 24 MHz. Since the core clock (HCLK) is maxed out at 48 MHz, **1 wait state** is required to read instructions from Flash.
+  
+  There are two highly probable factors causing these timing irregularities:
+  1. **Prefetch Buffer & Branch Penalties:** At higher optimization levels (`-O2`/`-O3`), the execution loop becomes extremely tight and fast. At this boundary, the processor experiences periodic internal stalls due to instruction fetch misses in the prefetch buffer during the loop jump (`while(1)` branch instruction), requiring a buffer refill.
+  2. **Loop Unrolling:** The compiler may have unrolled the loop partially, and the wider gaps represent the execution overhead of the loop boundary jump, while the tight pulse groups represent back-to-back register modifications.
+
 
 ## 💡 Conclusion
 While the STMicroelectronics HAL library drastically simplifies development and improves code portability across different STM32 families, it introduces massive performance penalties (up to 14.5x slower execution). For strict real-time applications, time-critical protocols, or low-overhead interrupt handlers, direct register modification via CMSIS combined with high compiler optimization (`-O2`/`-O3`) is mandatory.
